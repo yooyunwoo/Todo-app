@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <main className="flex flex-1 justify-center bg-zinc-50 px-4 py-12 dark:bg-black">
       <div className="flex w-full max-w-md flex-col gap-6 self-start rounded-2xl bg-white p-6 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-800">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">할 일 목록</h1>
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">우리들의 할 일</h1>
         <AddTodoForm />
         <Suspense fallback={<p className="text-sm text-zinc-500">불러오는 중…</p>}>
           <TodoList />

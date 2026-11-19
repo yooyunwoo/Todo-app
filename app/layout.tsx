@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "할 일 목록",
+  title: "우리들의 할 일",
   description: "모두가 함께 쓰는 할 일 목록",
 };
 
