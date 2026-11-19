@@ -23,19 +23,41 @@ function createDbClient(): Client {
   });
 }
 
+// 처음 만든 뒤에 추가된 칸. 이미 있는 테이블에는 ALTER TABLE로 붙인다.
+const ADDED_COLUMNS = [
+  { name: "due_date", definition: "due_date TEXT" },
+  { name: "category", definition: "category TEXT" },
+] as const;
+
+async function migrate(db: Client): Promise<void> {
+  await db.execute(
+    `CREATE TABLE IF NOT EXISTS todos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      done INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      due_date TEXT,
+      category TEXT
+    )`,
+  );
+
+  const info = await db.execute("PRAGMA table_info(todos)");
+  const existing = new Set(info.rows.map((row) => String(row.name)));
+
+  for (const column of ADDED_COLUMNS) {
+    if (existing.has(column.name)) continue;
+    try {
+      await db.execute(`ALTER TABLE todos ADD COLUMN ${column.definition}`);
+    } catch (error) {
+      // 로컬과 Vercel이 동시에 추가하면 한쪽은 "duplicate column"으로 실패한다. 이미 있으면 괜찮다.
+      if (!(error instanceof Error && /duplicate column/i.test(error.message))) throw error;
+    }
+  }
+}
+
 function ensureSchema(db: Client): Promise<void> {
   if (!schemaReady) {
-    schemaReady = db
-      .execute(
-        `CREATE TABLE IF NOT EXISTS todos (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          title TEXT NOT NULL,
-          done INTEGER NOT NULL DEFAULT 0,
-          created_at TEXT NOT NULL DEFAULT (datetime('now'))
-        )`,
-      )
-      .then(() => undefined)
-      .catch((error: unknown) => {
+    schemaReady = migrate(db).catch((error: unknown) => {
         // 실패하면 다음 요청에서 다시 시도한다.
         schemaReady = null;
         throw error;
