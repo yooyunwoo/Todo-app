@@ -1,4 +1,5 @@
 // 하나뿐인 목록의 할 일을 읽고 바꾼다. 서버에서만 사용.
+import "server-only";
 import { getDb } from "./db";
 
 export type Todo = {

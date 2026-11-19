@@ -1,0 +1,20 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      # DB는 요청 시점에만 읽으므로(connection()) 빌드에는 Turso 환경변수가 필요 없다.
+      - run: npm run build

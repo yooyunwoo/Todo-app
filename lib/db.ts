@@ -1,5 +1,6 @@
-// Turso(libSQL) 접속은 이 파일 한 곳에서만 한다.
-// 서버 컴포넌트와 서버 액션에서만 import할 것 — 클라이언트 컴포넌트에서 import하면 안 된다.
+// Turso(libSQL) 접속은 이 파일 한 곳에서만 한다 (ESLint no-restricted-imports로 강제).
+// server-only: 클라이언트 컴포넌트에서 import하면 빌드가 실패한다.
+import "server-only";
 import { createClient, type Client } from "@libsql/client";
 
 const REQUIRED_ENV = ["TURSO_DATABASE_URL", "TURSO_AUTH_TOKEN"] as const;
